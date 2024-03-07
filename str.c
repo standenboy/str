@@ -7,6 +7,11 @@ typedef struct {
 	int length;
 } str;
 
+typedef struct {
+	str *strings;
+	int count;
+} strs;
+
 str *initStr(char *STR, int length){ // creates a new string, if the length is -1 it is calculated from the STR input, otherwise an empty string is created with size length
 	if (length == -1){
 		char *tmpString = malloc(strlen(STR));
@@ -17,14 +22,22 @@ str *initStr(char *STR, int length){ // creates a new string, if the length is -
 		STRING->bytes = (char*)malloc(STRING->length+1); 
 		STRING->bytes = tmpString;
 		return STRING;
-	}
-	else{
+	}else{
 		str *STRING = malloc(sizeof(str));
 		STRING->length = length; 
 		STRING->bytes = (char*)calloc(0, STRING->length+1);
 		return STRING;
 	}
+}
 
+strs *initArrayStr(int length, int count){ // creates an array that is count large of str's each one being size length 
+	strs *STRING = malloc(sizeof(strs));
+	STRING->strings = malloc(sizeof(str)*count);
+	for (int i = 0; i < count; i++){
+		STRING->strings[i].length = length; 
+		STRING->strings[i].bytes = (char*)calloc(0, length+1);
+	}
+	return STRING;
 }
 
 void strconcat(str *string1, str *string2){ // concats two strings together storing the output in string1
@@ -38,7 +51,6 @@ void strconcat(str *string1, str *string2){ // concats two strings together stor
 	
 	string1->bytes = output->bytes;
 	string1->length = output->length;
-
 }
 
 void strappend(str *string1, str *string2){ // appends a string to the start of another string, same as strconcat but backwards
@@ -72,12 +84,22 @@ void freeStr(str *string){ // frees the memory alocated to a string !!!MUST BE D
 	free(string);
 }
 
+void freeArrayStr(strs *strings){ // frees the memory alocated to a string !!!MUST BE DONE!!!
+	for (int i = 0; i < strings->count; i++){
+		free(strings->strings->bytes);
+	}
+	free(strings);
+}
+
 int main(){
-	str *myString = initStr("hello", -1);
-	str *myOtherString = initStr("There", -1);
-	strconcat(myString, myOtherString);
-	freeStr(myOtherString);
-	strstrip(myString, 'h');
-	printf("%s\n", myString->bytes);
-	freeStr(myString);
+	strs *myStrings = initArrayStr(10, 3);
+	for (int i = 0; i < 3; i++){
+		scanf("%s", myStrings->strings[i].bytes);
+	}
+	strappend(&myStrings->strings[0], &myStrings->strings[1]);
+	for (int i = 0; i < 3; i++){
+		printf("%s\n", myStrings->strings[i].bytes);
+	}
+
+	freeArrayStr(myStrings);
 }
