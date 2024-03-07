@@ -41,6 +41,10 @@ void strconcat(str *string1, str *string2){ // concats two strings together stor
 
 }
 
+void strappend(str *string1, str *string2){ // appends a string to the start of another string, same as strconcat but backwards
+	strconcat(string2, string1);
+}
+
 void strstrip(str *string, char toStrip){ // removes all instances of the char toStrip
 	int occurrences = 0;
 	for (int i = 0; i < string->length; i++){
@@ -61,6 +65,7 @@ void strstrip(str *string, char toStrip){ // removes all instances of the char t
 	string->bytes = tmpString;
 	string->length = string->length - occurrences;
 }
+
 
 void freeStr(str *string){ // frees the memory alocated to a string !!!MUST BE DONE!!!
 	free(string->bytes);
