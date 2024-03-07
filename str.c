@@ -37,6 +37,7 @@ strs *initArrayStr(int length, int count){ // creates an array that is count lar
 		STRING->strings[i].length = length; 
 		STRING->strings[i].bytes = (char*)calloc(0, length+1);
 	}
+	STRING->count = count;
 	return STRING;
 }
 
@@ -50,7 +51,7 @@ void strconcat(str *string1, str *string2){ // concats two strings together stor
 	str *output = initStr(tmpString, -1);
 	
 	string1->bytes = output->bytes;
-	string1->length = output->length;
+	string1->length= output->length; 
 }
 
 void strappend(str *string1, str *string2){ // appends a string to the start of another string, same as strconcat but backwards
@@ -78,6 +79,40 @@ void strstrip(str *string, char toStrip){ // removes all instances of the char t
 	string->length = string->length - occurrences;
 }
 
+strs *strsplit(str *string, char delim){ // takes a string, splits it into an array of stings, divided by the deliminer, deliminer is removed
+	// 123..456...789
+	// split at . should return [123, 456, 789]
+	// number of elements = number of delims + 1
+	// unless the delim is next to itself, in which case a block of delims should be counted as 1
+	int delimCount = 0;	
+	char prev; 
+	for (int i = 0; i < string->length; i++){
+		if (string->bytes[i] == delim){
+			if (string->bytes[i] != prev){
+				delimCount++;
+			}
+		}
+	}
+
+	delimCount++;
+	strs *output = initArrayStr(string->length, delimCount);	
+
+	int charCounter = 0;
+	int currentStr = 0;
+	for (int i = 0; i < string->length; i++){
+		if (string->bytes[i] == delim){
+			if (i != 0 && string->bytes[i] != string->bytes[i-1]){
+				currentStr++;
+				charCounter = 0;
+			}
+		}else{
+			output->strings[currentStr].bytes[charCounter] = string->bytes[i];
+			charCounter++;
+		}
+	}
+
+	return output;
+}
 
 void freeStr(str *string){ // frees the memory alocated to a string !!!MUST BE DONE!!!
 	free(string->bytes);
@@ -85,21 +120,24 @@ void freeStr(str *string){ // frees the memory alocated to a string !!!MUST BE D
 }
 
 void freeArrayStr(strs *strings){ // frees the memory alocated to a string !!!MUST BE DONE!!!
-	for (int i = 0; i < strings->count; i++){
-		free(strings->strings->bytes);
-	}
+	free(strings->strings);
 	free(strings);
 }
 
 int main(){
-	strs *myStrings = initArrayStr(10, 3);
-	for (int i = 0; i < 3; i++){
-		scanf("%s", myStrings->strings[i].bytes);
-	}
-	strappend(&myStrings->strings[0], &myStrings->strings[1]);
-	for (int i = 0; i < 3; i++){
-		printf("%s\n", myStrings->strings[i].bytes);
-	}
+	
+	str *myString = initStr("", 10);
+	scanf("%s", myString->bytes);
+	strconcat(myString, myString);
+	printf("%s\n", myString->bytes);
+	exit(0);
 
+	strs *myStrings = strsplit(myString, 'l');
+
+	for (int i = 0; i < myStrings->count; i++){
+		printf("%s\n", myStrings->strings[i].bytes); 
+	}
+	
+	freeStr(myString);
 	freeArrayStr(myStrings);
 }
