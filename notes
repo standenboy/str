@@ -1,0 +1,2 @@
+fix memory leaks
+to do this you need to make it so values are copied, not pointers too them (memset?)
